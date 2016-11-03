@@ -4,18 +4,19 @@ using System.Collections;
 
 public class Osero : MonoBehaviour {
 
+	public static Osero instance;
 	public GameObject stone;
 	public GameObject frame;
 	const float stone_scaling = 0.6f;
 	const int width_num = 3;
-	public static int wall_x_min = 0;
-	public static int wall_x_max = width_num*2;
-	public static int wall_y_min = 1;
-	public static int wall_y_max = width_num*2 - 1;
-	public static int wall_z_min = 1;
-	public static int wall_z_max = width_num*2 - 1;
+	public int wall_x_min = 1;
+	public int wall_x_max = width_num*2 - 1;
+	public int wall_y_min = 1;
+	public int wall_y_max = width_num*2 - 1;
+	public int wall_z_min = 1;
+	public int wall_z_max = width_num*2 - 1;
 
-	public static StoneStatus.Status mycolor = StoneStatus.Status.Red;
+	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
 
 	const float stone_start_scaling = 0.25f;
 	const float frame_width = 0.01f;
@@ -23,6 +24,9 @@ public class Osero : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		if (instance == null) {
+			instance = this;
+		}
 		Vector3 start_position = Vector3.one * (-width * width_num + width / 2f);
 		for (int x = wall_x_min; x < wall_x_max; x++)
 			for (int y = wall_y_min; y < wall_y_max; y++)
@@ -53,16 +57,22 @@ public class Osero : MonoBehaviour {
 					GameObject z_frame = (GameObject)Instantiate (frame, position + new Vector3(0, 0, width/2), Quaternion.identity);
 					z_frame.transform.localScale = new Vector3 (frame_width, frame_width, width);
 				}
-		get_red_stone( GameObject.Find (Osero.get_stone_name (2,2,2)));
-		get_red_stone( GameObject.Find (Osero.get_stone_name (2,3,3)));
-		get_red_stone( GameObject.Find (Osero.get_stone_name (3,2,3)));
-		get_red_stone( GameObject.Find (Osero.get_stone_name (3,3,2)));
-		get_blue_stone( GameObject.Find (Osero.get_stone_name (2,2,3)));
-		get_blue_stone( GameObject.Find (Osero.get_stone_name (2,3,2)));
-		get_blue_stone( GameObject.Find (Osero.get_stone_name (3,2,2)));
-		get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
+		get_red_stone( GameObject.Find (get_stone_name (2,2,2)));
+		get_red_stone( GameObject.Find (get_stone_name (3,2,3)));
+		get_red_stone( GameObject.Find (get_stone_name (2,3,2)));
+		get_red_stone( GameObject.Find (get_stone_name (3,3,3)));
+		get_blue_stone( GameObject.Find (get_stone_name (2,2,3)));
+		get_blue_stone( GameObject.Find (get_stone_name (3,2,2)));
+		get_blue_stone( GameObject.Find (get_stone_name (2,3,3)));
+		get_blue_stone( GameObject.Find (get_stone_name (3,3,2)));
 			
-			
+	//	get_red_stone( GameObject.Find (Osero.get_stone_name (2,2,2)));
+	//	get_blue_stone( GameObject.Find (Osero.get_stone_name (2,2,3)));
+		
+	//	get_red_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
+	//	get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,2)));
+
+		//get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
 	
 	}
 	
@@ -71,21 +81,21 @@ public class Osero : MonoBehaviour {
 	
 	}
 
-	static string get_stone_name(int x, int y, int z) {
+	string get_stone_name(int x, int y, int z) {
 		return x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
 	}
-	static void get_red_stone(GameObject stone) {
+	void get_red_stone(GameObject stone) {
 		stone.GetComponent<Renderer> ().material.color = Color.red;
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
 		stonestatus.set_red ();
 	}
-	static void get_blue_stone(GameObject stone) {
+	void get_blue_stone(GameObject stone) {
 		stone.GetComponent<Renderer> ().material.color = Color.blue;
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
 		stonestatus.set_blue ();
 	}
 	
-	public static void set_stone(GameObject stone, StoneStatus.Status color) {
+	public void set_stone(GameObject stone) {
 		bool find_enemy_stone = false;
 
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
@@ -103,20 +113,20 @@ public class Osero : MonoBehaviour {
 						x += dx;
 						y += dy;
 						z += dz;
-						if (x < Osero.wall_x_min || x >= Osero.wall_x_max ||
-							y < Osero.wall_y_min || y >= Osero.wall_y_max || 
-							z < Osero.wall_z_min || z >= Osero.wall_z_max) {
+						if (x < wall_x_min || x >= wall_x_max ||
+							y < wall_y_min || y >= wall_y_max || 
+							z < wall_z_min || z >= wall_z_max) {
 							break;
 						}
 
-						GameObject next_stone = GameObject.Find (Osero.get_stone_name (x, y, z));
+						GameObject next_stone = GameObject.Find (get_stone_name (x, y, z));
 						StoneStatus next_stonestatus = next_stone.GetComponent<StoneStatus> ();
 
 						if (next_stonestatus.state == StoneStatus.Status.White) {
 							break;
 						}
 
-						if (next_stonestatus.state == color) {
+						if (next_stonestatus.state == mycolor) {
 							while (true) {
 								x -= dx;
 								y -= dy;
@@ -126,9 +136,9 @@ public class Osero : MonoBehaviour {
 									z == stonestatus.z) {
 									break;
 								}
-								GameObject before_stone = GameObject.Find (Osero.get_stone_name (x, y, z));
+								GameObject before_stone = GameObject.Find (get_stone_name (x, y, z));
 								find_enemy_stone = true;
-								switch (color) {
+								switch (mycolor) {
 								case StoneStatus.Status.Red:
 									get_red_stone (before_stone);
 									break;
@@ -144,7 +154,7 @@ public class Osero : MonoBehaviour {
 			}
 		}
 		if (find_enemy_stone) {
-			switch (color) {
+			switch (mycolor) {
 			case StoneStatus.Status.Red:
 				get_red_stone (stone);
 				break;
@@ -155,13 +165,13 @@ public class Osero : MonoBehaviour {
 			Changeturn ();	
 		}
 	}
-	static void Changeturn() {
-		switch (Osero.mycolor) {
+	void Changeturn() {
+		switch (mycolor) {
 		case StoneStatus.Status.Red:
-			Osero.mycolor = StoneStatus.Status.Blue;
+			mycolor = StoneStatus.Status.Blue;
 			break;
 		case StoneStatus.Status.Blue:
-			Osero.mycolor = StoneStatus.Status.Red;
+			mycolor = StoneStatus.Status.Red;
 			break;
 		}
 

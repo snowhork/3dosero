@@ -50,7 +50,7 @@ public class RayController : MonoBehaviour {
 				}
 
 				if (time_count >= 1f) {
-					Osero.set_stone (stone, Osero.mycolor);
+					Osero.instance.set_stone (stone);
 					StartCoroutine("Wait");
 					time_count = 0;
 				}

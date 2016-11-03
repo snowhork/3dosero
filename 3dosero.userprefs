@@ -1,8 +1,10 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Osero.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/Osero.cs">
     <Files>
-      <File FileName="Assets/Osero.cs" Line="15" Column="69" />
+      <File FileName="Assets/Script/RayController.cs" Line="29" Column="5" />
+      <File FileName="Assets/Script/Osero.cs" Line="68" Column="59" />
+      <File FileName="Assets/Script/StoneStatus.cs" Line="41" Column="22" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
