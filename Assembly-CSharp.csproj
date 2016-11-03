@@ -50,6 +50,7 @@
      <Compile Include="Assets\Dive\Scripts\OpenDiveSensor.cs" />
      <Compile Include="Assets\Dive\Scripts\StartCamera.cs" />
      <Compile Include="Assets\GyroScript.cs" />
+     <Compile Include="Assets\Script\Canvas.cs" />
      <Compile Include="Assets\Script\Osero.cs" />
      <Compile Include="Assets\Script\RayController.cs" />
      <Compile Include="Assets\Script\StoneStatus.cs" />

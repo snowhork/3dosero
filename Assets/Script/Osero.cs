@@ -15,6 +15,9 @@ public class Osero : MonoBehaviour {
 	public int wall_y_max = width_num*2 - 1;
 	public int wall_z_min = 1;
 	public int wall_z_max = width_num*2 - 1;
+	public int white_stones_num = 0;
+	public int red_stones_num = 0;
+	public int blue_stones_num = 0;
 
 	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
 
@@ -57,6 +60,10 @@ public class Osero : MonoBehaviour {
 					GameObject z_frame = (GameObject)Instantiate (frame, position + new Vector3(0, 0, width/2), Quaternion.identity);
 					z_frame.transform.localScale = new Vector3 (frame_width, frame_width, width);
 				}
+		white_stones_num =
+		(wall_x_max - wall_x_min) * 
+		(wall_y_max - wall_y_min) * 
+		(wall_z_max - wall_z_min);
 		get_red_stone( GameObject.Find (get_stone_name (2,2,2)));
 		get_red_stone( GameObject.Find (get_stone_name (3,2,3)));
 		get_red_stone( GameObject.Find (get_stone_name (2,3,2)));
@@ -75,26 +82,38 @@ public class Osero : MonoBehaviour {
 		//get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
 	
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	void down_stones_num(GameObject stone) {
+		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
+		switch (stonestatus.state) {
+		case StoneStatus.Status.White:
+			white_stones_num--;	
+			break;
+		case StoneStatus.Status.Red:
+			red_stones_num--;
+			break;
+		case StoneStatus.Status.Blue:
+			blue_stones_num--;
+			break;
+		}
 	}
 
 	string get_stone_name(int x, int y, int z) {
 		return x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
 	}
 	void get_red_stone(GameObject stone) {
+		down_stones_num (stone);
 		stone.GetComponent<Renderer> ().material.color = Color.red;
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
+		red_stones_num++;
 		stonestatus.set_red ();
 	}
 	void get_blue_stone(GameObject stone) {
+		down_stones_num (stone);
 		stone.GetComponent<Renderer> ().material.color = Color.blue;
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
+		blue_stones_num++;
 		stonestatus.set_blue ();
 	}
-	
 	public void set_stone(GameObject stone) {
 		bool find_enemy_stone = false;
 
@@ -174,8 +193,6 @@ public class Osero : MonoBehaviour {
 			mycolor = StoneStatus.Status.Red;
 			break;
 		}
-
-
 	}
 }
 
