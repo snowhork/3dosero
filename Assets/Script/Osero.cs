@@ -9,6 +9,7 @@ public class Osero : MonoBehaviour {
 	public Material white_material;
 	public Material blue_material;
 	public Material red_material;
+	public Material yellow_material;
 	public GameObject frame;
 
 	const int width_num = 3;
