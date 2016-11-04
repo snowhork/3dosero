@@ -105,9 +105,7 @@ public class Osero : MonoBehaviour {
 						continue;
 					}
 					while (true) {
-						x += dx;
-						y += dy;
-						z += dz;
+						x += dx; y += dy; z += dz;
 						if (x < wall_x_min || x >= wall_x_max ||
 							y < wall_y_min || y >= wall_y_max || 
 							z < wall_z_min || z >= wall_z_max) {
@@ -121,12 +119,8 @@ public class Osero : MonoBehaviour {
 
 						if (next_stonestatus.state == mycolor) {
 							while (true) {
-								x -= dx;
-								y -= dy;
-								z -= dz;
-								if (x == position.x &&
-									y == position.y &&
-									z == position.z) {
+								x -= dx; y -= dy; z -= dz;
+								if (position.isequal(x,y,z)) {
 									break;
 								}
 								get_stone (stone_statuses [x, y, z], mycolor);

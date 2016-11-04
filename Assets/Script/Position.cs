@@ -20,5 +20,8 @@ public class Position : MonoBehaviour {
 	public bool isequal(Position other) {
 		return x == other.x && y == other.y && z == other.z;
 	}
+	public bool isequal(int x, int y, int z) {
+		return this.x == x && this.y == y && this.z == z;
+	}
 
 }
