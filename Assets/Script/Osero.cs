@@ -7,7 +7,7 @@ public class Osero : MonoBehaviour {
 	public static Osero instance;
 	public GameObject stone;
 	public GameObject frame;
-	const float stone_scaling = 0.6f;
+
 	const int width_num = 3;
 	public int wall_x_min = 1;
 	public int wall_x_max = width_num*2 - 1;
@@ -20,7 +20,9 @@ public class Osero : MonoBehaviour {
 	public int blue_stones_num = 0;
 
 	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
+	public StoneStatus.Status[,,] stone_statuses;
 
+	const float stone_scaling = 0.6f;
 	const float stone_start_scaling = 0.25f;
 	const float frame_width = 0.01f;
 	float width = 2.2f;
@@ -30,6 +32,18 @@ public class Osero : MonoBehaviour {
 		if (instance == null) {
 			instance = this;
 		}
+		else {
+			return;
+		}
+		stone_statuses = new StoneStatus.Status[width_num*2, width_num*2, width_num*2];
+		for (int x = 0; x < width * 2; x++) {
+			for (int y = 0; y < width * 2; y++) {
+				for (int z = 0; z < width * 2; z++) {
+					stone_statuses [x, y, z] = StoneStatus.Status.None;
+				}
+			}
+		}
+
 		Vector3 start_position = Vector3.one * (-width * width_num + width / 2f);
 		for (int x = wall_x_min; x < wall_x_max; x++)
 			for (int y = wall_y_min; y < wall_y_max; y++)
@@ -52,6 +66,7 @@ public class Osero : MonoBehaviour {
 					stonestatus.x = x;
 					stonestatus.y = y;
 					stonestatus.z = z;
+					stone_statuses [x, y, z] = StoneStatus.Status.White;
 
 					GameObject x_frame = (GameObject)Instantiate (frame, position + new Vector3(width/2, 0, 0), Quaternion.identity);
 					x_frame.transform.localScale = new Vector3 (width, frame_width, frame_width);
@@ -102,6 +117,7 @@ public class Osero : MonoBehaviour {
 	}
 	void get_red_stone(GameObject stone) {
 		down_stones_num (stone);
+		
 		stone.GetComponent<Renderer> ().material.color = Color.red;
 		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
 		red_stones_num++;

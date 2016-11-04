@@ -7,6 +7,7 @@ public class StoneStatus : MonoBehaviour {
 		White,
 		Red,
 		Blue,
+		None,
 	}
 
 	public int x;
