@@ -52,6 +52,7 @@
      <Compile Include="Assets\GyroScript.cs" />
      <Compile Include="Assets\Script\Canvas.cs" />
      <Compile Include="Assets\Script\Osero.cs" />
+     <Compile Include="Assets\Script\Position.cs" />
      <Compile Include="Assets\Script\RayController.cs" />
      <Compile Include="Assets\Script\StoneStatus.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />

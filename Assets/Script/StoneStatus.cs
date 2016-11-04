@@ -10,16 +10,12 @@ public class StoneStatus : MonoBehaviour {
 		None,
 	}
 
-	public int x;
-	public int y;
-	public int z;
+	public Position position;	
 	public Status state;
 	// Use this for initialization
-	public StoneStatus() {
-		x = -1000;
-		y = -1000;
-		z = -1000;
-		state = Status.White;
+	public StoneStatus(int x, int y, int z) {
+		position = new Position (x, y, z);
+		state = Status.None;
 	}
 
 	void Start () {
@@ -31,8 +27,27 @@ public class StoneStatus : MonoBehaviour {
 	
 	}
 
-	public bool isequal(StoneStatus other) {
-		return x == other.x && y == other.y && z == other.z;
+	public Color get_color() {
+		switch (state) {
+		case Status.White:
+			return Color.white;
+		case Status.Red:
+			return Color.red;
+		case Status.Blue:
+			return Color.blue;
+		}
+		return Color.white;
+	}
+	public static Color get_color(Status color) {
+		switch (color) {
+		case Status.White:
+			return Color.white;
+		case Status.Red:
+			return Color.red;
+		case Status.Blue:
+			return Color.blue;
+		}
+		return Color.white;
 	}
 
 	public void set_red() {
@@ -40,5 +55,11 @@ public class StoneStatus : MonoBehaviour {
 	}
 	public void set_blue() {
 		state = Status.Blue;
+	}
+	public void set_state(Status state) {
+		this.state = state;
+	}
+	public void set_position(int x, int y, int z) {
+		position.set_position (x, y, z);
 	}
 }

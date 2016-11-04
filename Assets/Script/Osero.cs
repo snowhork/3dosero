@@ -20,7 +20,7 @@ public class Osero : MonoBehaviour {
 	public int blue_stones_num = 0;
 
 	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
-	public StoneStatus.Status[,,] stone_statuses;
+	public StoneStatus[,,] stone_statuses;
 
 	const float stone_scaling = 0.6f;
 	const float stone_start_scaling = 0.25f;
@@ -35,11 +35,11 @@ public class Osero : MonoBehaviour {
 		else {
 			return;
 		}
-		stone_statuses = new StoneStatus.Status[width_num*2, width_num*2, width_num*2];
+		stone_statuses = new StoneStatus[width_num*2, width_num*2, width_num*2];
 		for (int x = 0; x < width * 2; x++) {
 			for (int y = 0; y < width * 2; y++) {
 				for (int z = 0; z < width * 2; z++) {
-					stone_statuses [x, y, z] = StoneStatus.Status.None;
+					stone_statuses [x, y, z] = new StoneStatus (x, y, z);
 				}
 			}
 		}
@@ -62,11 +62,11 @@ public class Osero : MonoBehaviour {
 					GameObject new_stone = (GameObject)Instantiate (stone, position, Quaternion.identity);
 					new_stone.name = get_stone_name (x, y, z);
 					new_stone.transform.localScale = Vector3.one*(stone_start_scaling + max_depth * stone_scaling);
-					StoneStatus stonestatus = new_stone.GetComponent<StoneStatus> ();
-					stonestatus.x = x;
-					stonestatus.y = y;
-					stonestatus.z = z;
-					stone_statuses [x, y, z] = StoneStatus.Status.White;
+					Position new_stone_position = new_stone.GetComponent<Position> ();
+
+					new_stone_position.set_position(x,y,z);					
+
+					stone_statuses [x, y, z].set_state (StoneStatus.Status.White);
 
 					GameObject x_frame = (GameObject)Instantiate (frame, position + new Vector3(width/2, 0, 0), Quaternion.identity);
 					x_frame.transform.localScale = new Vector3 (width, frame_width, frame_width);
@@ -79,68 +79,28 @@ public class Osero : MonoBehaviour {
 		(wall_x_max - wall_x_min) * 
 		(wall_y_max - wall_y_min) * 
 		(wall_z_max - wall_z_min);
-		get_red_stone( GameObject.Find (get_stone_name (2,2,2)));
-		get_red_stone( GameObject.Find (get_stone_name (3,2,3)));
-		get_red_stone( GameObject.Find (get_stone_name (2,3,2)));
-		get_red_stone( GameObject.Find (get_stone_name (3,3,3)));
-		get_blue_stone( GameObject.Find (get_stone_name (2,2,3)));
-		get_blue_stone( GameObject.Find (get_stone_name (3,2,2)));
-		get_blue_stone( GameObject.Find (get_stone_name (2,3,3)));
-		get_blue_stone( GameObject.Find (get_stone_name (3,3,2)));
-			
-	//	get_red_stone( GameObject.Find (Osero.get_stone_name (2,2,2)));
-	//	get_blue_stone( GameObject.Find (Osero.get_stone_name (2,2,3)));
-		
-	//	get_red_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
-	//	get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,2)));
+		get_stone (stone_statuses [2, 2, 2], StoneStatus.Status.Red);
+		get_stone (stone_statuses [3, 2, 3], StoneStatus.Status.Red);
+		get_stone (stone_statuses [2, 3, 2], StoneStatus.Status.Red);
+		get_stone (stone_statuses [3, 3, 3], StoneStatus.Status.Red);
 
-		//get_blue_stone( GameObject.Find (Osero.get_stone_name (3,3,3)));
-	
-	}
-	void down_stones_num(GameObject stone) {
-		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
-		switch (stonestatus.state) {
-		case StoneStatus.Status.White:
-			white_stones_num--;	
-			break;
-		case StoneStatus.Status.Red:
-			red_stones_num--;
-			break;
-		case StoneStatus.Status.Blue:
-			blue_stones_num--;
-			break;
-		}
+		get_stone (stone_statuses [2, 2, 3], StoneStatus.Status.Blue);
+		get_stone (stone_statuses [3, 2, 2], StoneStatus.Status.Blue);
+		get_stone (stone_statuses [2, 3, 3], StoneStatus.Status.Blue);
+		get_stone (stone_statuses [3, 3, 2], StoneStatus.Status.Blue);
 	}
 
-	string get_stone_name(int x, int y, int z) {
-		return x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
-	}
-	void get_red_stone(GameObject stone) {
-		down_stones_num (stone);
-		
-		stone.GetComponent<Renderer> ().material.color = Color.red;
-		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
-		red_stones_num++;
-		stonestatus.set_red ();
-	}
-	void get_blue_stone(GameObject stone) {
-		down_stones_num (stone);
-		stone.GetComponent<Renderer> ().material.color = Color.blue;
-		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
-		blue_stones_num++;
-		stonestatus.set_blue ();
-	}
-	public void set_stone(GameObject stone) {
+	public void set_stone(StoneStatus stone_status) {
 		bool find_enemy_stone = false;
 
-		StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
+		Position position = stone_status.position;
 
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dy = -1; dy <= 1; dy++) {
 				for (int dz = -1; dz <= 1; dz++) {
-					int x = stonestatus.x;
-					int y = stonestatus.y;
-					int z = stonestatus.z;
+					int x = position.x;
+					int y = position.y;
+					int z = position.z;
 					if (dx == 0 && dy == 0 && dz == 0) {
 						continue;
 					}
@@ -153,9 +113,7 @@ public class Osero : MonoBehaviour {
 							z < wall_z_min || z >= wall_z_max) {
 							break;
 						}
-
-						GameObject next_stone = GameObject.Find (get_stone_name (x, y, z));
-						StoneStatus next_stonestatus = next_stone.GetComponent<StoneStatus> ();
+						StoneStatus next_stonestatus = stone_statuses [x, y, z];
 
 						if (next_stonestatus.state == StoneStatus.Status.White) {
 							break;
@@ -166,21 +124,13 @@ public class Osero : MonoBehaviour {
 								x -= dx;
 								y -= dy;
 								z -= dz;
-								if (x == stonestatus.x &&
-									y == stonestatus.y &&
-									z == stonestatus.z) {
+								if (x == position.x &&
+									y == position.y &&
+									z == position.z) {
 									break;
 								}
-								GameObject before_stone = GameObject.Find (get_stone_name (x, y, z));
+								get_stone (stone_statuses [x, y, z], mycolor);
 								find_enemy_stone = true;
-								switch (mycolor) {
-								case StoneStatus.Status.Red:
-									get_red_stone (before_stone);
-									break;
-								case StoneStatus.Status.Blue:
-									get_blue_stone (before_stone);
-									break;
-								}
 							}
 							break;
 						}
@@ -189,17 +139,60 @@ public class Osero : MonoBehaviour {
 			}
 		}
 		if (find_enemy_stone) {
-			switch (mycolor) {
-			case StoneStatus.Status.Red:
-				get_red_stone (stone);
-				break;
-			case StoneStatus.Status.Blue:
-				get_blue_stone (stone);
-				break;
-			}
+			get_stone (stone_statuses [position.x, position.y, position.z], mycolor);
 			Changeturn ();	
 		}
 	}
+
+	public StoneStatus get_stone_status(Position position) {
+		return stone_statuses [position.x, position.y, position.z];
+	}
+
+	void down_stones_num(StoneStatus.Status state) {
+		switch (state) {
+		case StoneStatus.Status.White:
+			white_stones_num--;	
+			break;
+		case StoneStatus.Status.Red:
+			red_stones_num--;
+			break;
+		case StoneStatus.Status.Blue:
+			blue_stones_num--;
+			break;
+		}
+	}
+
+	void up_stones_num(StoneStatus.Status state) {
+		switch (state) {
+		case StoneStatus.Status.White:
+			white_stones_num++;	
+			break;
+		case StoneStatus.Status.Red:
+			red_stones_num++;
+			break;
+		case StoneStatus.Status.Blue:
+			blue_stones_num++;
+			break;
+		}
+	}
+		
+	string get_stone_name(int x, int y, int z) {
+		return x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
+	}
+
+	string get_stone_name(Position position) {
+		return position.x.ToString() + "," + position.y.ToString() + "," + position.z.ToString() + ",";
+	}
+
+	void get_stone(StoneStatus status, StoneStatus.Status color) {
+		down_stones_num (status.state);
+		status.set_state (color);
+		up_stones_num (color);
+
+		stone = GameObject.Find (get_stone_name (status.position));
+		stone.GetComponent<Renderer> ().material.color = StoneStatus.get_color (color);
+	}
+
 	void Changeturn() {
 		switch (mycolor) {
 		case StoneStatus.Status.Red:

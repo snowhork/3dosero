@@ -10,13 +10,12 @@ public class RayController : MonoBehaviour {
 
 	void reset_pre_stone(){
 		if (!first_flag) {
-			if (pre_stone.GetComponent<StoneStatus> ().state == StoneStatus.Status.White) {
+			if (Osero.instance.get_stone_status (pre_stone.GetComponent<Position> ()).state == StoneStatus.Status.White) {
 				pre_stone.GetComponent<Renderer> ().material.color = Color.white;
 			}
 			time_count = 0;
 		}
 	}
-
 
 	// Use this for initialization
 	void Start () {
@@ -32,27 +31,25 @@ public class RayController : MonoBehaviour {
 		if (Physics.Raycast (ray, out hit) && !changed_turn) {
 			Debug.DrawLine (ray.origin, hit.point, Color.black);
 			GameObject stone = hit.collider.gameObject;
-			if (hit.collider.gameObject.tag == "Stone" && stone.GetComponent<StoneStatus> ().state == StoneStatus.Status.White) {
+			if (hit.collider.gameObject.tag == "Stone") {
+				Position position = stone.GetComponent<Position> ();
+				if (Osero.instance.get_stone_status (position).state == StoneStatus.Status.White) {
+					if (first_flag) {
+						pre_stone = stone;
+						first_flag = false;
+					}
+					if (position.isequal (pre_stone.GetComponent<Position> ())) {
+						time_count += Time.deltaTime;
+					} else {
+						reset_pre_stone ();
+					}
+					stone.GetComponent<Renderer> ().material.color = Color.yellow;
 
-				if (first_flag) {
-					pre_stone = stone;
-					first_flag = false;
-				}
-					
-				StoneStatus stonestatus = stone.GetComponent<StoneStatus> ();
-				stone.GetComponent<Renderer> ().material.color = Color.yellow;
-
-				if (stonestatus.isequal (pre_stone.GetComponent<StoneStatus> ())) {
-					time_count += Time.deltaTime;
-				} else {
-					reset_pre_stone ();
-
-				}
-
-				if (time_count >= 1f) {
-					Osero.instance.set_stone (stone);
-					StartCoroutine("Wait");
-					time_count = 0;
+					if (time_count >= 1f) {
+						Osero.instance.set_stone (Osero.instance.get_stone_status (position));
+						StartCoroutine ("Wait");
+						time_count = 0;
+					}
 				}
 				pre_stone = stone;
 			} else {
