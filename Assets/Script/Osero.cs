@@ -6,6 +6,9 @@ public class Osero : MonoBehaviour {
 
 	public static Osero instance;
 	public GameObject stone;
+	public Material white_material;
+	public Material blue_material;
+	public Material red_material;
 	public GameObject frame;
 
 	const int width_num = 3;
@@ -22,12 +25,11 @@ public class Osero : MonoBehaviour {
 	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
 	public StoneStatus[,,] stone_statuses;
 
-	const float stone_scaling = 0.6f;
-	const float stone_start_scaling = 0.25f;
-	const float frame_width = 0.01f;
+	const float stone_scaling = 0.8f;
+	const float stone_start_scaling = 0.35f;
+	const float frame_width = 0.04f;
 	float width = 2.2f;
 
-	// Use this for initialization
 	void Start () {
 		if (instance == null) {
 			instance = this;
@@ -48,31 +50,28 @@ public class Osero : MonoBehaviour {
 		for (int x = wall_x_min; x < wall_x_max; x++)
 			for (int y = wall_y_min; y < wall_y_max; y++)
 				for (int z = wall_z_min; z < wall_z_max; z++) {
-					Vector3 position = start_position + new Vector3 (x, y, z) * width;
+					Vector3 world_position = start_position + new Vector3 (x, y, z) * width;
 
-					float[] abs_position = new float[3] { Mathf.Abs (position.x), Mathf.Abs (position.y), Mathf.Abs (position.z) };
-
+					float[] abs_position = new float[3] { Mathf.Abs (world_position.x), Mathf.Abs (world_position.y), Mathf.Abs (world_position.z) };
 					float max_position = -width * width_num;
 					for (int i = 0; i < 3; i++) {
 						if (max_position < abs_position [i])
 							max_position = abs_position [i];
 					}
 					float max_depth = (max_position - width / 2) / width;
-					
-					GameObject new_stone = (GameObject)Instantiate (stone, position, Quaternion.identity);
-					new_stone.name = get_stone_name (x, y, z);
+					GameObject new_stone = (GameObject)Instantiate (stone, world_position, Quaternion.identity);
+					new_stone.GetComponent<Position> ().set_position(x,y,z);
+					new_stone.name = get_stone_name (new Position(x,y,z));
 					new_stone.transform.localScale = Vector3.one*(stone_start_scaling + max_depth * stone_scaling);
-					Position new_stone_position = new_stone.GetComponent<Position> ();
-
-					new_stone_position.set_position(x,y,z);					
+					new_stone.GetComponent<Renderer> ().material = white_material;
 
 					stone_statuses [x, y, z].set_state (StoneStatus.Status.White);
 
-					GameObject x_frame = (GameObject)Instantiate (frame, position + new Vector3(width/2, 0, 0), Quaternion.identity);
+					GameObject x_frame = (GameObject)Instantiate (frame, world_position + new Vector3(width/2, 0, 0), Quaternion.identity);
 					x_frame.transform.localScale = new Vector3 (width, frame_width, frame_width);
-					GameObject y_frame = (GameObject)Instantiate (frame, position + new Vector3(0, width/2, 0), Quaternion.identity);
+					GameObject y_frame = (GameObject)Instantiate (frame, world_position + new Vector3(0, width/2, 0), Quaternion.identity);
 					y_frame.transform.localScale = new Vector3 (frame_width, width, frame_width);
-					GameObject z_frame = (GameObject)Instantiate (frame, position + new Vector3(0, 0, width/2), Quaternion.identity);
+					GameObject z_frame = (GameObject)Instantiate (frame, world_position + new Vector3(0, 0, width/2), Quaternion.identity);
 					z_frame.transform.localScale = new Vector3 (frame_width, frame_width, width);
 				}
 		white_stones_num =
@@ -134,7 +133,7 @@ public class Osero : MonoBehaviour {
 		}
 		if (find_enemy_stone) {
 			get_stone (stone_statuses [position.x, position.y, position.z], mycolor);
-			Changeturn ();	
+			Changeturn ();				
 		}
 	}
 
@@ -182,10 +181,23 @@ public class Osero : MonoBehaviour {
 		down_stones_num (status.state);
 		status.set_state (color);
 		up_stones_num (color);
-
-		stone = GameObject.Find (get_stone_name (status.position));
-		stone.GetComponent<Renderer> ().material.color = StoneStatus.get_color (color);
+		Change_stone_material (color, status.position);		
 	}
+
+	void Change_stone_material (StoneStatus.Status color, Position position) {
+		GameObject stone = GameObject.Find (get_stone_name (position));
+		switch (color) {
+		case StoneStatus.Status.Red:
+			stone.GetComponent<Renderer> ().material = red_material;
+			return;
+		case StoneStatus.Status.White:
+			stone.GetComponent<Renderer> ().material = white_material;
+			break;
+		case StoneStatus.Status.Blue:
+			stone.GetComponent<Renderer> ().material = blue_material;
+			break;
+		}
+	}	
 
 	void Changeturn() {
 		switch (mycolor) {
@@ -198,7 +210,3 @@ public class Osero : MonoBehaviour {
 		}
 	}
 }
-
-
-
-

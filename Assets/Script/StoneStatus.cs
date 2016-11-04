@@ -18,15 +18,6 @@ public class StoneStatus : MonoBehaviour {
 		state = Status.None;
 	}
 
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
 	public Color get_color() {
 		switch (state) {
 		case Status.White:

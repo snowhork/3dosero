@@ -11,7 +11,7 @@ public class RayController : MonoBehaviour {
 	void reset_pre_stone(){
 		if (!first_flag) {
 			if (Osero.instance.get_stone_status (pre_stone.GetComponent<Position> ()).state == StoneStatus.Status.White) {
-				pre_stone.GetComponent<Renderer> ().material.color = Color.white;
+				pre_stone.GetComponent<Renderer> ().material.color = Color.gray;
 			}
 			time_count = 0;
 		}
@@ -31,7 +31,9 @@ public class RayController : MonoBehaviour {
 		if (Physics.Raycast (ray, out hit) && !changed_turn) {
 			Debug.DrawLine (ray.origin, hit.point, Color.black);
 			GameObject stone = hit.collider.gameObject;
+			print (hit.collider.gameObject.name);
 			if (hit.collider.gameObject.tag == "Stone") {
+				
 				Position position = stone.GetComponent<Position> ();
 				if (Osero.instance.get_stone_status (position).state == StoneStatus.Status.White) {
 					if (first_flag) {
