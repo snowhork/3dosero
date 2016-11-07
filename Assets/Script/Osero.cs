@@ -4,15 +4,28 @@ using System.Collections;
 
 public class Osero : MonoBehaviour {
 
+	public enum SetStoneMode {
+		Real,
+		Virtual,
+		Settable,
+	};
+
 	public static Osero instance;
 	public GameObject stone;
 	public Material white_material;
 	public Material blue_material;
 	public Material red_material;
 	public Material yellow_material;
-	public GameObject frame;
 
-	const int width_num = 3;
+	public GameObject red_hit;
+	public GameObject blue_hit;
+	public GameObject blue_sprays;
+	public GameObject red_sprays;
+
+	public GameObject frame;
+	public Ai ai;
+
+	public const int width_num = 3;
 	public int wall_x_min = 1;
 	public int wall_x_max = width_num*2 - 1;
 	public int wall_y_min = 1;
@@ -26,7 +39,7 @@ public class Osero : MonoBehaviour {
 	public StoneStatus.Status mycolor = StoneStatus.Status.Red;
 	public StoneStatus[,,] stone_statuses;
 
-	const float stone_scaling = 0.8f;
+	const float stone_scaling = 0.85f;
 	const float stone_start_scaling = 0.35f;
 	const float frame_width = 0.04f;
 	float width = 2.2f;
@@ -39,9 +52,9 @@ public class Osero : MonoBehaviour {
 			return;
 		}
 		stone_statuses = new StoneStatus[width_num*2, width_num*2, width_num*2];
-		for (int x = 0; x < width * 2; x++) {
-			for (int y = 0; y < width * 2; y++) {
-				for (int z = 0; z < width * 2; z++) {
+		for (int x = 0; x < width_num * 2; x++) {
+			for (int y = 0; y < width_num * 2; y++) {
+				for (int z = 0; z < width_num * 2; z++) {
 					stone_statuses [x, y, z] = new StoneStatus (x, y, z);
 				}
 			}
@@ -60,7 +73,22 @@ public class Osero : MonoBehaviour {
 							max_position = abs_position [i];
 					}
 					float max_depth = (max_position - width / 2) / width;
+
 					GameObject new_stone = (GameObject)Instantiate (stone, world_position, Quaternion.identity);
+					Vector3[] directions = new Vector3[3] { 
+						new Vector3 (width, frame_width, frame_width),
+						new Vector3 (frame_width, width, frame_width),
+						new Vector3 (frame_width, frame_width, width),
+					};
+					for (int i = 0; i < 3; i++) {
+						GameObject new_frame = (GameObject)Instantiate (frame, 
+							world_position, Quaternion.identity);
+						//new_frame.transform.localScale = new Vector3 (frame_width, frame_width, width/4);
+						new_frame.transform.localScale = directions [i];
+						//new_frame.transform.rotation = Quaternion.Euler (directions [i] * 90);
+						new_frame.name = get_frame_name (new Position (x, y, z), i);
+					}
+
 					new_stone.GetComponent<Position> ().set_position(x,y,z);
 					new_stone.name = get_stone_name (new Position(x,y,z));
 					new_stone.transform.localScale = Vector3.one*(stone_start_scaling + max_depth * stone_scaling);
@@ -68,12 +96,6 @@ public class Osero : MonoBehaviour {
 
 					stone_statuses [x, y, z].set_state (StoneStatus.Status.White);
 
-					GameObject x_frame = (GameObject)Instantiate (frame, world_position + new Vector3(width/2, 0, 0), Quaternion.identity);
-					x_frame.transform.localScale = new Vector3 (width, frame_width, frame_width);
-					GameObject y_frame = (GameObject)Instantiate (frame, world_position + new Vector3(0, width/2, 0), Quaternion.identity);
-					y_frame.transform.localScale = new Vector3 (frame_width, width, frame_width);
-					GameObject z_frame = (GameObject)Instantiate (frame, world_position + new Vector3(0, 0, width/2), Quaternion.identity);
-					z_frame.transform.localScale = new Vector3 (frame_width, frame_width, width);
 				}
 		white_stones_num =
 		(wall_x_max - wall_x_min) * 
@@ -90,10 +112,14 @@ public class Osero : MonoBehaviour {
 		get_stone (stone_statuses [3, 3, 2], StoneStatus.Status.Blue);
 	}
 
-	public void set_stone(StoneStatus stone_status) {
+	public bool set_stone(StoneStatus stone_status, SetStoneMode mode = SetStoneMode.Real, StoneStatus[,,] virtual_statuses = null) {
 		bool find_enemy_stone = false;
 
 		Position position = stone_status.position;
+
+		if (!(stone_status.state == StoneStatus.Status.White)) {
+			return false;
+		}
 
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dy = -1; dy <= 1; dy++) {
@@ -111,8 +137,18 @@ public class Osero : MonoBehaviour {
 							z < wall_z_min || z >= wall_z_max) {
 							break;
 						}
-						StoneStatus next_stonestatus = stone_statuses [x, y, z];
-
+						StoneStatus next_stonestatus = null;
+						switch (mode) {
+						case SetStoneMode.Real:
+							next_stonestatus = stone_statuses [x, y, z];
+							break;
+						case SetStoneMode.Virtual:
+							next_stonestatus = virtual_statuses [x, y, z];							
+							break;
+						case SetStoneMode.Settable:
+							next_stonestatus = stone_statuses [x, y, z];							
+							break;
+						}
 						if (next_stonestatus.state == StoneStatus.Status.White) {
 							break;
 						}
@@ -123,7 +159,28 @@ public class Osero : MonoBehaviour {
 								if (position.isequal(x,y,z)) {
 									break;
 								}
-								get_stone (stone_statuses [x, y, z], mycolor);
+								switch (mode) {
+								case SetStoneMode.Real:
+									get_stone (stone_statuses [x, y, z], mycolor, mode);
+									GameObject sprays = null;
+									switch (mycolor) {
+									case StoneStatus.Status.Red:
+										sprays = red_sprays;
+										break;
+									case StoneStatus.Status.Blue:
+										sprays = blue_sprays;
+										break;
+									}
+									Destroy (
+										Instantiate (sprays, 
+											GameObject.Find (get_stone_name (position)).transform.position,
+											Quaternion.LookRotation (new Vector3 (dx, dy, dz))),
+										2f);
+									break;
+								case SetStoneMode.Virtual:
+									get_stone (virtual_statuses [x, y, z], mycolor, mode, virtual_statuses);
+									break;
+								}
 								find_enemy_stone = true;
 							}
 							break;
@@ -133,9 +190,18 @@ public class Osero : MonoBehaviour {
 			}
 		}
 		if (find_enemy_stone) {
-			get_stone (stone_statuses [position.x, position.y, position.z], mycolor);
-			Changeturn ();				
+			switch (mode) {
+			case SetStoneMode.Real:
+				get_stone (stone_statuses [position.x, position.y, position.z], mycolor);
+				Changeturn ();
+				break;
+			case SetStoneMode.Virtual:				
+				get_stone (virtual_statuses [position.x, position.y, position.z], mycolor, mode, virtual_statuses);
+				break;
+			}
+
 		}
+		return find_enemy_stone;
 	}
 
 	public StoneStatus get_stone_status(Position position) {
@@ -171,43 +237,96 @@ public class Osero : MonoBehaviour {
 	}
 		
 	string get_stone_name(int x, int y, int z) {
-		return x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
+		return "stone" + x.ToString() + "," + y.ToString() + "," + z.ToString() + ",";
 	}
 
 	string get_stone_name(Position position) {
-		return position.x.ToString() + "," + position.y.ToString() + "," + position.z.ToString() + ",";
+		return get_stone_name (position.x, position.y, position.z);
 	}
 
-	void get_stone(StoneStatus status, StoneStatus.Status color) {
-		down_stones_num (status.state);
-		status.set_state (color);
-		up_stones_num (color);
-		Change_stone_material (color, status.position);		
+	string get_frame_name(Position position, int i) {
+		return "frame" + position.x + "," + position.y + "," + position.z + "," + i;
+	}
+
+	void get_stone(StoneStatus status, StoneStatus.Status color, SetStoneMode mode = SetStoneMode.Real, StoneStatus[,,] virtual_status = null) {
+		StoneStatus.Status oldcolor = status.state;
+		status.set_state (color);		
+
+		switch (mode) {
+		case SetStoneMode.Real:
+			Change_stone_material (color, status.position);
+			down_stones_num (oldcolor);				
+			up_stones_num (color);
+			break;
+		}
+			
 	}
 
 	void Change_stone_material (StoneStatus.Status color, Position position) {
 		GameObject stone = GameObject.Find (get_stone_name (position));
 		switch (color) {
 		case StoneStatus.Status.Red:
+			Destroy(Instantiate (red_hit, stone.transform.position, Quaternion.identity), 3f);
 			stone.GetComponent<Renderer> ().material = red_material;
-			return;
+			break;
 		case StoneStatus.Status.White:
 			stone.GetComponent<Renderer> ().material = white_material;
 			break;
 		case StoneStatus.Status.Blue:
+			Destroy (Instantiate (blue_hit, stone.transform.position, Quaternion.identity),3f);
 			stone.GetComponent<Renderer> ().material = blue_material;
 			break;
 		}
+	
+		/*for (int i = 0; i < 3; i++) {
+			GameObject frame = GameObject.Find (get_frame_name (position, i));
+			switch (color) {
+			case StoneStatus.Status.Red:
+				frame.GetComponent<Renderer> ().material = red_material;
+				break;
+			case StoneStatus.Status.White:
+				frame.GetComponent<Renderer> ().material = white_material;
+				break;
+			case StoneStatus.Status.Blue:
+				frame.GetComponent<Renderer> ().material = blue_material;
+				break;
+			}
+		}*/
+
 	}	
 
 	void Changeturn() {
 		switch (mycolor) {
 		case StoneStatus.Status.Red:
 			mycolor = StoneStatus.Status.Blue;
+			if (exists_set_stone ()) {
+				//ai.myturn = true;
+			} else {
+				mycolor = StoneStatus.Status.Red;
+			}
 			break;
 		case StoneStatus.Status.Blue:
 			mycolor = StoneStatus.Status.Red;
+			if (exists_set_stone ()) {
+				
+			} else {
+				mycolor = StoneStatus.Status.Blue;
+			}
 			break;
 		}
+	}
+
+	bool exists_set_stone() {
+		
+		for (int x = Osero.instance.wall_x_min; x < Osero.instance.wall_x_max; x++)
+			for (int y = Osero.instance.wall_y_min; y < Osero.instance.wall_y_max; y++)
+				for (int z = Osero.instance.wall_z_min; z < Osero.instance.wall_z_max; z++) {
+
+					Position position = new Position (x, y, z);
+					if (Osero.instance.set_stone (Osero.instance.get_stone_status (position), Osero.SetStoneMode.Settable)) {
+						return true;
+					}
+				}
+		return false;
 	}
 }
