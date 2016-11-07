@@ -14,7 +14,7 @@ public class RayController : MonoBehaviour {
 	void reset_pre_stone(){
 		if (!first_flag) {
 			if (Osero.instance.get_stone_status (pre_stone.GetComponent<Position> ()).state == StoneStatus.Status.White) {
-				pre_stone.GetComponent<Renderer> ().material = Osero.instance.white_material;
+				pre_stone.GetComponent<Renderer> ().material = Osero.instance.white_material;				
 			}
 			time_count = 0;
 		}
@@ -55,29 +55,23 @@ public class RayController : MonoBehaviour {
 						pre_stone = stone;
 						first_flag = false;
 					}
-					if (position.isequal (pre_stone.GetComponent<Position> ())) {
-						if (Osero.instance.set_stone (Osero.instance.get_stone_status (position), Osero.SetStoneMode.Settable)) {
-							time_count += Time.deltaTime;
+					if (Osero.instance.set_stone (Osero.instance.get_stone_status (position), Osero.SetStoneMode.Settable)) {
+						if (time_count == 0) {
+							Destroy (Instantiate (yellow_hit, stone.transform.position, Quaternion.identity), 1f);
 							stone.GetComponent<Renderer> ().material = Osero.instance.yellow_material;
 						}
-					} else {
-						if (Osero.instance.set_stone (Osero.instance.get_stone_status (position), Osero.SetStoneMode.Settable)) {
-							Destroy (Instantiate (yellow_hit, stone.transform.position, Quaternion.identity), 1f);	
-						} else {
-							Destroy (Instantiate (black_hit, stone.transform.position, Quaternion.identity), 1f);	
-						}
-											
-						reset_pre_stone ();
-
-					}
-					if (time_count >= 1f) {
-						if(Osero.instance.set_stone (Osero.instance.get_stone_status (position), Osero.SetStoneMode.Settable)) {
+						if (time_count >= 1f) {
 							Osero.instance.set_stone (Osero.instance.get_stone_status (position));
 							StartCoroutine ("Wait");
+							time_count = 0;
 						}
-
-
-						time_count = 0;
+					} else {
+						if (time_count == 0) {
+							Destroy (Instantiate (black_hit, stone.transform.position, Quaternion.identity), 1f);	
+						}
+					}
+					if (position.isequal(pre_stone.GetComponent<Position>())) {
+						time_count += Time.deltaTime;
 					}
 				} else {
 					reset_pre_stone ();
@@ -86,7 +80,6 @@ public class RayController : MonoBehaviour {
 			} else {
 				reset_pre_stone ();
 			}
-	
 		} else {
 			reset_pre_stone();
 		}
