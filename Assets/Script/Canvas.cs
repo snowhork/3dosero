@@ -16,11 +16,11 @@ public class Canvas : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		red_num.text = "Red: " + Osero.instance.red_stones_num;
-		blue_num.text = "Blue: " + Osero.instance.blue_stones_num;
-		white_num.text = "White: " + Osero.instance.white_stones_num;
+		red_num.text = "Red: " + Osero.Instance.RedStonesNum;
+		blue_num.text = "Blue: " + Osero.Instance.BlueStonesNum;
+		white_num.text = "Bluck: " + Osero.Instance.BlackStonesNum;
 
-		switch (Osero.instance.mycolor) {
+		switch (Osero.Instance.mycolor) {
 		case StoneStatus.Status.Red:
 			turn.text = "Red TURN";
 			break;
