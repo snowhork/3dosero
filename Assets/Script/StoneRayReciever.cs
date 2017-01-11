@@ -3,8 +3,14 @@ using System.Collections;
 
 public class StoneRayReciever : RayReciever {
 
-	const float changeStoneCnt = 2f;
-	Const.Color rayonColor;	
+	const float changeStoneCnt = 1f;
+	RayCaster caster;
+	Player player { get { return caster.GetComponent<Player> (); } }
+	Const.Color rayonColor { get { return player.PlayerColor; } }
+
+	StoneInfo info { get { return GetComponent<Stone> ().Info; } } 
+	bool settable { get { return info.Settable(rayonColor); } }
+	Const.Color stoneColor { get { return info.color; } }
 
 	void Update() {
 		base.Update ();
@@ -12,16 +18,14 @@ public class StoneRayReciever : RayReciever {
 			foreach (StoneInfo stoneInfo in info.SetStone (rayonColor)) {
 				Osero.Instance.SetStone (stoneInfo.position, rayonColor);
 			}
+			Osero.Instance.SetStone (info.position, rayonColor);
+			player.TurnEnd ();
 		}
 	}
-
-	StoneInfo info { get { return GetComponent<Stone> ().Info; } } 
-	bool settable { get { return info.Settable(rayonColor); } }
-	Const.Color stoneColor { get { return info.color; } }
-
+		
 	protected override void SwitchToRayOn(RayCaster caster) {
 		base.SwitchToRayOn (caster);
-		rayonColor = caster.GetComponent<RayController> ().PlayerColor;
+		this.caster = caster;
 		if (stoneColor != Const.Color.Black) {
 			return;
 		}

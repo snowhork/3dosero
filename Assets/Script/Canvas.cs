@@ -16,15 +16,15 @@ public class Canvas : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		red_num.text = "Red: " + Osero.Instance.RedStonesNum;
-		blue_num.text = "Blue: " + Osero.Instance.BlueStonesNum;
-		white_num.text = "Bluck: " + Osero.Instance.BlackStonesNum;
+		red_num.text = "Red: " + Osero.Instance.CountStone(Const.Color.Red);
+		blue_num.text = "Blue: " + Osero.Instance.CountStone(Const.Color.Blue);
+		white_num.text = "Black: " + Osero.Instance.CountStone(Const.Color.Black);
 
-		switch (Osero.Instance.mycolor) {
-		case StoneStatus.Status.Red:
+		switch (Osero.Instance.BoardColor) {
+		case Const.Color.Red:
 			turn.text = "Red TURN";
 			break;
-		case StoneStatus.Status.Blue:
+		case Const.Color.Blue:
 			turn.text = "Blue TURN";
 			break;
 		}

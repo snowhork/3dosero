@@ -5,16 +5,34 @@ using System.Collections.Generic;
 public class Board {
 
 	Position widthNum;
-	//public Position WidthNum { get { return widthNum; } }
 	int WidthX { get { return widthNum.x; } }
 	int WidthY { get { return widthNum.y; } }
 	int WidthZ { get { return widthNum.z; } }
 	public int MaxWidth { get { return WidthX; } }
 
 	StoneInfo[,,] StoneInfos;
+	Const.Color boardColor;
+	public Const.Color color { 
+		get { 
+			return boardColor; 
+		} 
+		set {
+			boardColor = value;
+		}
+	}
 
 	public Type[,,] WidthArray<Type>() {
 		return new Type[WidthX*2, WidthY*2, WidthZ*2];
+	}
+
+	public int CountStone(Const.Color color) {
+		int result = 0;
+		foreach (Position p in StonesIterator) {
+			if (GetStoneColor (p) == color) {
+				result++;
+			}
+		}
+		return result;
 	}
 
 	public IEnumerable StonesIterator
@@ -33,6 +51,7 @@ public class Board {
 	public Board(Position widthNum) {
 		this.widthNum = widthNum;
 		StoneInfos = new StoneInfo[WidthX * 2, WidthY * 2, WidthZ * 2];
+		color = Const.Color.Red;
 	}
 
 	bool IsInRange(Position p) {
@@ -80,8 +99,7 @@ public class Board {
 					break;
 				}
 				if (GetStoneColor (n) == color) {
-					for(n = n - d; n != p; n = n - d) {					
-						Debug.Log (n.x);	
+					for(n = n - d; n != p; n = n - d) {
 						if (GetStoneColor (n) == Const.antiColor (color)) {
 							list.Add (GetStoneInfo (n));
 						}
