@@ -4,34 +4,39 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] Osero osero;
-    [SerializeField] private IPlayer _player1;
-    [SerializeField] private IPlayer _player2;
+
+    [SerializeField] Osero _osero;
+    [SerializeField] Player player;
+    [SerializeField] Ai ai;
+
+    public Osero osero { get { return _osero; }}
+    private IPlayer _player1;
+    private IPlayer _player2;
 
     private IPlayer RivalPlayer(IPlayer player)
     {
-        if (player == _player1)
-        {
-            return _player2;
-        }
-        else
-        {
-            return _player1;
-        }
+        return player == _player1 ? _player2 : _player1;
     }
 
     public void ChangeTurn(IPlayer player)
     {
-        osero.board.color = player.Color;
+        osero.Board.color = player.Color;
         RivalPlayer(player).StartTurn();
     }
 
 
-    void Start () {
+    void Start ()
+    {
+        _player1 = player;
+        _player2 = ai;
+        _player1.Color = Const.Color.Red;
+        _player2.Color = Const.Color.Blue;
+
         _player1.SetGameManager(this);
         _player2.SetGameManager(this);
-        osero.initialize ();
 
+        osero.initialize ();
+        _player1.StartTurn();
     }
 
 }

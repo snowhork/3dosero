@@ -33,13 +33,12 @@ public class StoneInfo {
 		}
 	}
 
+    public StoneInfo() {
+        stone_position = new Position ();
+    }
 
-	public bool Settable(Const.Color color) {
+    public bool Settable(Const.Color color) {
 		return board.Settable (position, color);
-	}
-
-	public StoneInfo() {
-		stone_position = new Position ();
 	}
 
 	public List<StoneInfo> SetStone(Const.Color color) {
@@ -54,8 +53,4 @@ public class StoneInfo {
 	public void set_position(int x, int y, int z) {
 		stone_position.set_position (x, y, z);
 	}
-//
-//	public void set_position(Position p) {
-//		stone_position.set_position (p);
-//	}
 }

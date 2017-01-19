@@ -3,52 +3,83 @@ using System.Collections;
 
 public class StoneRayReciever : RayReciever
 {
-	const float changeStoneCnt = 1f;
-	RayCaster caster;
+    public const float ChangeStoneCnt = 1f;
+    public RayCaster Caster { get; set; }
 
-    Player player { get { return caster.GetComponent<Player> (); } }
-    Stone stone { get { return GetComponent<Stone> (); } }
+    private Player Player
+    {
+        get { return Caster.GetComponent<Player>(); }
+    }
 
-    Const.Color rayonColor { get { return player.Color; } }
-	StoneInfo info { get { return GetComponent<Stone> ().Info; } } 
-	bool settable { get { return info.Settable(rayonColor); } }
-	Const.Color stoneColor { get { return info.color; } }
+    Stone Stone
+    {
+        get { return GetComponent<Stone>(); }
+    }
 
-	void Update() {
-		base.Update ();
-		if (rayon && raycnt >= changeStoneCnt && settable) {
-			foreach (StoneInfo stoneInfo in info.SetStone (rayonColor)) {
-				stone.osero.SetStone (stoneInfo.position, rayonColor);
-			}
-			stone.osero.SetStone (info.position, rayonColor);
-			player.TurnEnd ();
-		}
-	}
-		
-	protected override void SwitchToRayOn(RayCaster caster) {
-		base.SwitchToRayOn (caster);
-		this.caster = caster;
-		if (stoneColor != Const.Color.Black) {
-			return;
-		}
-		if (settable) {
-			ParticleManager.Instance.HitEffect (Const.Color.Yellow, transform.position);
-			MaterialManager.Instance.SetMaterial (Const.Color.Yellow, gameObject);	
-		} else {
-			ParticleManager.Instance.HitEffect (Const.Color.Black, transform.position);
-		}
-	}
+    private Const.Color RayonColor
+    {
+        get { return Player.Color; }
+    }
 
-	protected override void SwitchToRayOff(RayCaster caster) {
-		base.SwitchToRayOff (caster);
-		MaterialManager.Instance.SetMaterial (stoneColor, gameObject);
-	}
+    StoneInfo info
+    {
+        get { return GetComponent<Stone>().Info; }
+    }
 
-	public override void RayOn(RayCaster caster) {
-		base.RayOn (caster);
-	}
+    bool settable
+    {
+        get { return info.Settable(RayonColor); }
+    }
 
-	public override void RayOff(RayCaster caster) {
-		base.RayOff (caster);
-	}
+    Const.Color stoneColor
+    {
+        get { return info.color; }
+    }
+
+    void Update()
+    {
+        base.Update();
+        if (!rayon || !(raycnt >= ChangeStoneCnt) || !settable) return;
+        foreach (var stoneInfo in info.SetStone(RayonColor))
+        {
+            Stone.osero.SetStone(stoneInfo.position, RayonColor);
+        }
+        Stone.osero.SetStone(info.position, RayonColor);
+        Player.EndTurn();
+    }
+
+    protected override void SwitchToRayOn(RayCaster caster)
+    {
+        base.SwitchToRayOn(caster);
+        this.Caster = caster;
+        if (stoneColor != Const.Color.Black)
+        {
+            return;
+        }
+        if (settable)
+        {
+            ParticleManager.Instance.HitEffect(Const.Color.Yellow, transform.position);
+            MaterialManager.Instance.SetMaterial(Const.Color.Yellow, gameObject);
+        }
+        else
+        {
+            ParticleManager.Instance.HitEffect(Const.Color.Black, transform.position);
+        }
+    }
+
+    protected override void SwitchToRayOff(RayCaster caster)
+    {
+        base.SwitchToRayOff(caster);
+        MaterialManager.Instance.SetMaterial(stoneColor, gameObject);
+    }
+
+    public override void RayOn(RayCaster caster)
+    {
+        base.RayOn(caster);
+    }
+
+    public override void RayOff(RayCaster caster)
+    {
+        base.RayOff(caster);
+    }
 }

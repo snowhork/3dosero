@@ -2,12 +2,11 @@
 using System.Collections;
 using System.ComponentModel.Design;
 
-public class Player : RayCaster,IPlayer
+public class Player : RayCaster, IPlayer
 {
     private GameManager _gameManager;
-
-    private Const.Color _color;
-    public Const.Color Color { get { return _color; } }
+    private bool _isTurn;
+    public Const.Color Color { get; set; }
 
     public void SetGameManager(GameManager gameManager)
     {
@@ -15,25 +14,26 @@ public class Player : RayCaster,IPlayer
     }
 
 
-	void Update () {
-		Vector3 rayPosition = transform.localPosition;
-		var ray = new Ray (rayPosition, transform.forward);
-		RayCast (ray);
-	}
-
-	public void TurnEnd() {
-//		Osero.Instance.Changeturn (Const.antiColor(color));
-		//color = Const.antiColor (color);
+    private void Update ()
+	{
+	    if (!_isTurn)
+	    {
+	        return;
+	    }
+	    var rayPosition = transform.localPosition;
+	    var ray = new Ray(rayPosition, transform.forward);
+	    RayCast(ray);
 	}
 
     public void StartTurn()
     {
-
+        _isTurn = true;
     }
 
     public void EndTurn()
     {
-         _gameManager.ChangeTurn(this);
+        _isTurn = false;
+        _gameManager.ChangeTurn(this);
     }
 
 }

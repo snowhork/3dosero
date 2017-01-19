@@ -3,7 +3,7 @@ using System.Collections;
 
 public interface IPlayer
 {
-    Const.Color Color { get; }
+    Const.Color Color { get; set; }
 
     void SetGameManager(GameManager gameManager);
 	void StartTurn ();

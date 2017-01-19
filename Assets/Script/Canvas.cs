@@ -11,7 +11,9 @@ public class Canvas : MonoBehaviour
     [SerializeField] Text BlueNum;
     [SerializeField] Text Turn;
 
-	void Update () {
+	void Update ()
+	{
+	    return;
 		RedNum.text = "Red: " + osero.CountStone(Const.Color.Red);
 		BlueNum.text = "Blue: " + osero.CountStone(Const.Color.Blue);
 		WhiteNum.text = "Black: " + osero.CountStone(Const.Color.Black);

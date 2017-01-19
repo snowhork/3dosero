@@ -12,7 +12,7 @@ public class StoneStatus : MonoBehaviour {
 
 	public Position position;	
 	public Status state;
-	// Use this for initialization
+
 	public StoneStatus(int x, int y, int z) {
 		position = new Position (x, y, z);
 		state = Status.None;
