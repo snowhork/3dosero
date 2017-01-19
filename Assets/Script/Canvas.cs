@@ -2,30 +2,26 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Canvas : MonoBehaviour {
+public class Canvas : MonoBehaviour
+{
 
-	public Text red_num;
-	public Text white_num;
-	public Text blue_num;
-	public Text turn;
+    [SerializeField] private Osero osero;
+    [SerializeField] Text RedNum;
+    [SerializeField] Text WhiteNum;
+    [SerializeField] Text BlueNum;
+    [SerializeField] Text Turn;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
 	void Update () {
-		red_num.text = "Red: " + Osero.Instance.CountStone(Const.Color.Red);
-		blue_num.text = "Blue: " + Osero.Instance.CountStone(Const.Color.Blue);
-		white_num.text = "Black: " + Osero.Instance.CountStone(Const.Color.Black);
+		RedNum.text = "Red: " + osero.CountStone(Const.Color.Red);
+		BlueNum.text = "Blue: " + osero.CountStone(Const.Color.Blue);
+		WhiteNum.text = "Black: " + osero.CountStone(Const.Color.Black);
 
-		switch (Osero.Instance.BoardColor) {
+		switch (osero.BoardColor) {
 		case Const.Color.Red:
-			turn.text = "Red TURN";
+			Turn.text = "Red TURN";
 			break;
 		case Const.Color.Blue:
-			turn.text = "Blue TURN";
+			Turn.text = "Blue TURN";
 			break;
 		}
 	}

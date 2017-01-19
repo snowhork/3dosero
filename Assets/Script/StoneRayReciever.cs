@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class StoneRayReciever : RayReciever {
-
+public class StoneRayReciever : RayReciever
+{
 	const float changeStoneCnt = 1f;
 	RayCaster caster;
-	Player player { get { return caster.GetComponent<Player> (); } }
-	Const.Color rayonColor { get { return player.PlayerColor; } }
 
+    Player player { get { return caster.GetComponent<Player> (); } }
+    Stone stone { get { return GetComponent<Stone> (); } }
+
+    Const.Color rayonColor { get { return player.Color; } }
 	StoneInfo info { get { return GetComponent<Stone> ().Info; } } 
 	bool settable { get { return info.Settable(rayonColor); } }
 	Const.Color stoneColor { get { return info.color; } }
@@ -16,9 +18,9 @@ public class StoneRayReciever : RayReciever {
 		base.Update ();
 		if (rayon && raycnt >= changeStoneCnt && settable) {
 			foreach (StoneInfo stoneInfo in info.SetStone (rayonColor)) {
-				Osero.Instance.SetStone (stoneInfo.position, rayonColor);
+				stone.osero.SetStone (stoneInfo.position, rayonColor);
 			}
-			Osero.Instance.SetStone (info.position, rayonColor);
+			stone.osero.SetStone (info.position, rayonColor);
 			player.TurnEnd ();
 		}
 	}

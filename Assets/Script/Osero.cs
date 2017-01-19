@@ -2,21 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Osero : SingletonMonoBehaviour<Osero> {
-
-	public enum SetStoneMode {
-		Real,
-		Virtual,
-		Settable,
-	};
-		
+public class Osero : MonoBehaviour {
+	
 	[SerializeField] GameObject stone_pref;
-	[SerializeField]  GameObject frame_pref;
-	Ai ai;
+	[SerializeField] GameObject frame_pref;
+
+	Ai ai = new Ai();
 
 	Position widthNum = new Position (2, 2, 2);
 	public Stone[,,] Stones;
-	Board board;
+    private Board _board;
+    public Board board { get { return _board; }}
 
 	const float stone_scaling = 0.85f;
 	const float stone_start_scaling = 0.35f;
@@ -45,6 +41,7 @@ public class Osero : SingletonMonoBehaviour<Osero> {
 
 	public void SetStone(Position p, Const.Color color) {
 		var stone = Stones [p.x, p.y, p.z];
+	    stone.SetOsero(this);
 		stone.ChangeColor (color);		
 	}
 
@@ -59,8 +56,8 @@ public class Osero : SingletonMonoBehaviour<Osero> {
 		stone.transform.localScale = Vector3.one*(stone_start_scaling + max_depth * stone_scaling);
 	}
 
-	void initialize() {
-		board = new Board (widthNum);
+	public void initialize() {
+		_board = new Board (widthNum);
 		Stones = board.WidthArray<Stone> ();
 		Vector3 start_position = Vector3.one * (-width * board.MaxWidth + width / 2f);
 
@@ -90,14 +87,14 @@ public class Osero : SingletonMonoBehaviour<Osero> {
 	}
 
 
-	void Start () {
-		initialize ();
-	
-	}
 
-	public void Changeturn(Const.Color color) {
-		board.color = color;
-	}
+
+//	public void Changeturn(Const.Color color) {
+//		board.color = color;
+//		AiTurn ();
+//		board.color = Const.antiColor(color);
+//
+//	}
 
 	public int CountStone(Const.Color color) {
 		return board.CountStone (color);
@@ -116,4 +113,11 @@ public class Osero : SingletonMonoBehaviour<Osero> {
 //				}
 		return false;
 	}
+
+	public void AiTurn() {
+		Position position = ai.decision (board);
+		SetStone (position, Const.Color.Blue);
+	}
+
+
 }
