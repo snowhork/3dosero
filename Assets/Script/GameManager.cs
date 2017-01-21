@@ -4,12 +4,15 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-
     [SerializeField] Osero _osero;
     [SerializeField] Player player;
     [SerializeField] Ai ai;
 
-    public Osero osero { get { return _osero; }}
+    public Osero osero
+    {
+        get { return _osero; }
+    }
+
     private IPlayer _player1;
     private IPlayer _player2;
 
@@ -25,7 +28,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void Start ()
+    void Start()
     {
         _player1 = player;
         _player2 = ai;
@@ -35,8 +38,7 @@ public class GameManager : MonoBehaviour
         _player1.SetGameManager(this);
         _player2.SetGameManager(this);
 
-        osero.initialize ();
+        osero.Initialize();
         _player1.StartTurn();
     }
-
 }

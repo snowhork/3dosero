@@ -7,30 +7,30 @@ public class Osero : MonoBehaviour
     [SerializeField] GameObject stone_pref;
     [SerializeField] GameObject frame_pref;
 
-    Ai ai = new Ai();
+    private readonly Ai _ai = new Ai();
 
-    Position widthNum = new Position(2, 2, 2);
+    private readonly Position _widthNum = new Position(2, 2, 2);
     public Stone[,,] Stones;
 
     public Board Board { get; private set; }
 
-    const float stone_scaling = 0.85f;
-    const float stone_start_scaling = 0.35f;
-    const float frame_width = 0.04f;
-    float width = 2.2f;
+    public const float StoneScaling = 0.85f;
+    public const float StoneStartScaling = 0.35f;
+    public const float FrameWidth = 0.04f;
+    readonly float _width = 2.2f;
 
     public Const.Color BoardColor
     {
         get { return Board.color; }
     }
 
-    void InstantiateFrame(Stone stone)
+    private void InstantiateFrame(Stone stone)
     {
         Vector3[] directions = new Vector3[3]
         {
-            new Vector3(width, frame_width, frame_width),
-            new Vector3(frame_width, width, frame_width),
-            new Vector3(frame_width, frame_width, width),
+            new Vector3(_width, FrameWidth, FrameWidth),
+            new Vector3(FrameWidth, _width, FrameWidth),
+            new Vector3(FrameWidth, FrameWidth, _width),
         };
         for (int i = 0; i < 3; i++)
         {
@@ -47,28 +47,28 @@ public class Osero : MonoBehaviour
         stone.ChangeColor(color);
     }
 
-    void set_stone_scale(Stone stone)
+    private void set_stone_scale(Stone stone)
     {
-        float[] abs_position = new float[3]
+        var abs_position = new float[3]
         {
             Mathf.Abs(stone.transform.position.x), Mathf.Abs(stone.transform.position.y),
             Mathf.Abs(stone.transform.position.z)
         };
-        float max_position = -width * Board.MaxWidth;
+        float max_position = -_width * Board.MaxWidth;
         for (int i = 0; i < 3; i++)
         {
             if (max_position < abs_position[i])
                 max_position = abs_position[i];
         }
-        float max_depth = (max_position - width / 2) / width;
-        stone.transform.localScale = Vector3.one * (stone_start_scaling + max_depth * stone_scaling);
+        float max_depth = (max_position - _width / 2) / _width;
+        stone.transform.localScale = Vector3.one * (StoneStartScaling + max_depth * StoneScaling);
     }
 
-    public void initialize()
+    public void Initialize()
     {
-        Board = new Board(widthNum);
+        Board = new Board(_widthNum);
         Stones = Board.WidthArray<Stone>();
-        var startPosition = Vector3.one * (-width * Board.MaxWidth + width / 2f);
+        var startPosition = Vector3.one * (-_width * Board.MaxWidth + _width / 2f);
 
         foreach (Position p in Board.StonesIterator)
         {
@@ -76,7 +76,7 @@ public class Osero : MonoBehaviour
             Stones[p.x, p.y, p.z] = stone;
             stone.SetOsero(this);
 
-            stone.transform.position = startPosition + new Vector3(p.x, p.y, p.z) * width;
+            stone.transform.position = startPosition + new Vector3(p.x, p.y, p.z) * _width;
             stone.transform.rotation = Quaternion.identity;
             set_stone_scale(stone);
             InstantiateFrame(stone);
@@ -96,14 +96,6 @@ public class Osero : MonoBehaviour
         SetStone(new Position(2, 2, 1), Const.Color.Blue);
     }
 
-
-//	public void Changeturn(Const.Color color) {
-//		board.color = color;
-//		AiTurn ();
-//		board.color = Const.antiColor(color);
-//
-//	}
-
     public int CountStone(Const.Color color)
     {
         return Board.CountStone(color);
@@ -121,11 +113,5 @@ public class Osero : MonoBehaviour
 //					}
 //				}
         return false;
-    }
-
-    public void AiTurn()
-    {
-        Position position = ai.decision(Board);
-        SetStone(position, Const.Color.Blue);
     }
 }

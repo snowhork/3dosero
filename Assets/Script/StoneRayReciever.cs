@@ -42,9 +42,9 @@ public class StoneRayReciever : RayReciever
         if (!rayon || !(raycnt >= ChangeStoneCnt) || !settable) return;
         foreach (var stoneInfo in info.SetStone(RayonColor))
         {
-            Stone.osero.SetStone(stoneInfo.position, RayonColor);
+            Stone.Osero.SetStone(stoneInfo.position, RayonColor);
         }
-        Stone.osero.SetStone(info.position, RayonColor);
+        Stone.Osero.SetStone(info.position, RayonColor);
         Player.EndTurn();
     }
 

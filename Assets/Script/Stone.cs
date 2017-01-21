@@ -3,11 +3,8 @@ using System.Collections;
 
 public class Stone : MonoBehaviour
 {
-    private Osero _osero;
-	StoneInfo stoneInfo;
-
-	public StoneInfo Info { get { return stoneInfo; } }
-    public Osero osero { get { return _osero; } }
+    public StoneInfo Info { get; private set; }
+    public Osero Osero { get; private set; }
 
     public void ChangeColor(Const.Color color) {
 		Info.color = color;
@@ -17,10 +14,10 @@ public class Stone : MonoBehaviour
 
     public void SetOsero(Osero osero)
     {
-        this._osero = osero;
+        this.Osero = osero;
     }
 
     Stone() {
-		stoneInfo = new StoneInfo ();
+		Info = new StoneInfo ();
 	}
 }
