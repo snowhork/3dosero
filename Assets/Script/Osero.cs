@@ -17,7 +17,7 @@ public class Osero : MonoBehaviour
     public const float StoneScaling = 0.85f;
     public const float StoneStartScaling = 0.35f;
     public const float FrameWidth = 0.04f;
-    readonly float _width = 2.2f;
+    private float _width = 2.2f;
 
     public Const.Color BoardColor
     {

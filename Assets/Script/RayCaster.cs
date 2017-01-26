@@ -31,19 +31,20 @@ public class RayCaster : MonoBehaviour
             Debug.DrawLine(ray.origin, hit.point, Color.red);
             var reciever = hit.collider.GetComponent(typeof(RayReciever)) as RayReciever;
 
-            if (this.Reciever == reciever)
+            if (Reciever == reciever)
             {
+                RayOn(Reciever);
                 return hit;
             }
 
-            RayOff(this.Reciever);
+            RayOff(Reciever);
             RayOn(reciever);
-            this.Reciever = reciever;
+            Reciever = reciever;
         }
         else
         {
-            RayOff(this.Reciever);
-            this.Reciever = null;
+            RayOff(Reciever);
+            Reciever = null;
         }
         return hit;
     }
